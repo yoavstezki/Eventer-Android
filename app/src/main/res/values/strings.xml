@@ -2,4 +2,26 @@
     <string name="app_name">Eventer</string>
     <string name="facebook_app_id">214793839083213</string>
     <string name="fb_login_protocol_scheme">fb214793839083213</string>
+    <string name="welcome">Welcome</string>
+    <string name="new_group">New Group</string>
+
+
+    <string-array name="Planets">
+        <item>Sun</item>
+        <item>Mercury</item>
+        <item>Venus</item>
+        <item>Earth</item>
+        <item>Mars</item>
+        <item>Jupiter</item>
+        <item>Saturn</item>
+        <item>Uranus</item>
+        <item>Neptune</item>
+    </string-array>
+    <string name="title_activity_new_group">NewGroup</string>
+    <string name="title_home">Home</string>
+    <string name="title_dashboard">Dashboard</string>
+    <string name="title_notifications">Notifications</string>
+    <string name="title">title</string>
+    <string name="create">Create</string>
+    <string name="clear">clear</string>
 </resources>

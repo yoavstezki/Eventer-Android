@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/container"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:paddingEnd="16dp"
+    android:paddingStart="16dp"
+    tools:context="com.yoavs.eventer.activity.NewGroupActivity">
+
+
+    <android.support.design.widget.TextInputLayout
+        android:id="@+id/textInputLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="10dp">
+
+        <android.support.design.widget.TextInputEditText
+            android:id="@+id/new_group_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/title" />
+    </android.support.design.widget.TextInputLayout>
+
+
+    <Button
+        android:id="@+id/new_group_clear_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/clear"
+        android:layout_below="@+id/textInputLayout"
+        android:layout_alignParentEnd="true"
+        android:layout_toEndOf="@id/new_group_create_btn"
+        />
+
+    <Button
+        android:id="@+id/new_group_create_btn"
+        android:layout_width="190dp"
+        android:layout_height="wrap_content"
+        android:text="@string/create"
+        android:layout_below="@+id/textInputLayout"
+        android:layout_alignParentStart="true"/>
+
+    <ProgressBar
+        android:id="@+id/new_group_pb"
+        style="?android:attr/progressBarStyle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:visibility="gone"/>
+
+</RelativeLayout>
