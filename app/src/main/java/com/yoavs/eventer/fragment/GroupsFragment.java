@@ -7,14 +7,17 @@ import android.support.v4.app.ListFragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ListView;
+import android.widget.ProgressBar;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.ValueEventListener;
 import com.yoavs.eventer.DB.UserGroupsDB;
 import com.yoavs.eventer.R;
-import com.yoavs.eventer.adpter.GroupListAdapter;
+import com.yoavs.eventer.activity.GroupDetailsActivity;
 import com.yoavs.eventer.activity.NewGroupActivity;
+import com.yoavs.eventer.adpter.GroupListAdapter;
 import com.yoavs.eventer.entity.Group;
 
 import java.util.ArrayList;
@@ -36,6 +39,7 @@ public class GroupsFragment extends ListFragment {
         View rootView = inflater.inflate(R.layout.fragment_groups, container, false);
 
         FloatingActionButton addNewGroup = rootView.findViewById(R.id.add_new_group);
+        final ProgressBar progressBar = rootView.findViewById(R.id.groups_progress_bar);
 
         setOnClick(addNewGroup);
 
@@ -52,12 +56,17 @@ public class GroupsFragment extends ListFragment {
 
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                     String groupKey = snapshot.getKey();
-                    UserGroupsDB.findGroup(groupKey).addValueEventListener(new ValueEventListener() {
+                    UserGroupsDB.findGroup(groupKey).addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
                         public void onDataChange(DataSnapshot dataSnapshot) {
                             Group group = dataSnapshot.getValue(Group.class);
-                            groups.add(group);
-                            groupListAdapter.notifyDataSetChanged();
+                            String key = dataSnapshot.getKey();
+                            group.setKey(key);
+
+                            if (!groups.contains(group)) {
+                                groups.add(group);
+                                groupListAdapter.notifyDataSetChanged();
+                            }
                         }
 
                         @Override
@@ -66,11 +75,13 @@ public class GroupsFragment extends ListFragment {
                         }
                     });
                 }
+
+                progressBar.setVisibility(View.GONE);
             }
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
-
+                progressBar.setVisibility(View.GONE);
             }
         });
 
@@ -88,4 +99,17 @@ public class GroupsFragment extends ListFragment {
         });
     }
 
+
+    @Override
+    public void onListItemClick(ListView l, View v, int position, long id) {
+        super.onListItemClick(l, v, position, id);
+
+        Group group = groups.get(position);
+
+        Intent intent = new Intent(this.getActivity(), GroupDetailsActivity.class);
+        intent.putExtra("groupName", group.getTitle());
+        intent.putExtra("groupKey", group.getKey());
+
+        startActivity(intent);
+    }
 }

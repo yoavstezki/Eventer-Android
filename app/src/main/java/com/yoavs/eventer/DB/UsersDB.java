@@ -1,15 +1,15 @@
 package com.yoavs.eventer.DB;
 
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.database.Query;
 import com.yoavs.eventer.entity.User;
+import com.yoavs.eventer.events.UserLeaveGroupEvent;
 
-import java.util.HashMap;
-import java.util.Map;
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 /**
  * @author yoavs
@@ -18,46 +18,37 @@ import java.util.Map;
 public class UsersDB {
 
     private static volatile UsersDB usersDB = new UsersDB();
-    private final String root = "users";
-    private DatabaseReference databaseReference;
-    private Map<String, User> userCache = new HashMap<>();
+    private final String usersNode = "users";
+    private DatabaseReference usersReference = FirebaseDatabase.getInstance().getReference(usersNode);
+    private EventBus eventBus = EventBus.getDefault();
 
-    private UsersDB() {
-        databaseReference = FirebaseDatabase.getInstance().getReference(root);
+    public UsersDB() {
+        eventBus.register(this);
     }
 
     public static UsersDB getInstance() {
         return usersDB;
     }
 
-    public User findUserByKey(String key) {
-        User cacheUser = userCache.get(key);
+    public DatabaseReference findUserByKey(String key) {
+        return usersReference.child(key);
+    }
 
-        if (cacheUser == null) {
-            databaseReference.child(root).child(key).addListenerForSingleValueEvent(new ValueEventListener() {
-                @Override
-                public void onDataChange(DataSnapshot dataSnapshot) {
-                    User user = dataSnapshot.getValue(User.class);
-                }
-
-                @Override
-                public void onCancelled(DatabaseError databaseError) {
-
-                }
-            });
-        }
-
-        return cacheUser;
+    public Query findUserByFacebookId(String facebookId) {
+        return usersReference.orderByChild("facebookId").equalTo(facebookId);
     }
 
     public void addUser(FirebaseUser firebaseUser, String facebookId) {
 
         String uid = firebaseUser.getUid();
 
-        User user = new User(uid, firebaseUser.getDisplayName(), facebookId);
+        User user = new User(firebaseUser.getDisplayName(), facebookId);
 
-        userCache.put(uid, user);
+        usersReference.child(uid).setValue(user);
+    }
 
-        databaseReference.child(uid).setValue(user);
+    @Subscribe(threadMode = ThreadMode.ASYNC)
+    public void userLeaveGroup(UserLeaveGroupEvent event) {
+        usersReference.child(event.getUserId()).child("groups").child(event.getGroupId()).removeValue();
     }
 }

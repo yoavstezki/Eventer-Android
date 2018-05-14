@@ -10,6 +10,7 @@ import android.support.v7.app.AppCompatActivity;
 
 import com.yoavs.eventer.R;
 import com.yoavs.eventer.fragment.GroupsFragment;
+import com.yoavs.eventer.fragment.ProfileFragment;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,7 +35,7 @@ public class MainActivity extends AppCompatActivity {
     private void setupViewPager(ViewPager viewPager) {
         ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
         adapter.addFragment(new GroupsFragment(), "Groups");
-//        adapter.addFragment(new TwoFragment(), "TWO");
+        adapter.addFragment(new ProfileFragment(), "Profile");
 //        adapter.addFragment(new ThreeFragment(), "THREE");
         viewPager.setAdapter(adapter);
     }

@@ -35,7 +35,7 @@ public class GroupListAdapter extends ArrayAdapter<Group> {
 
         TextView groupNameTextView = convertView.findViewById(R.id.group_name);
 
-        groupNameTextView.setText(group.title);
+        groupNameTextView.setText(group != null ? group.getTitle() : null);
 
         return convertView;
     }

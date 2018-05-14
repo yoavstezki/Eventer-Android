@@ -3,6 +3,14 @@
     package="com.yoavs.eventer">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+
+
+    <uses-feature
+        android:name="android.hardware.camera"
+        android:required="true" />
+
 
     <application
         android:allowBackup="true"
@@ -39,11 +47,20 @@
                 <data android:scheme="@string/fb_login_protocol_scheme" />
             </intent-filter>
         </activity>
-        <activity android:name=".activity.ProfileActivity" />
         <activity android:name=".activity.MainActivity" />
-        <activity
-            android:name=".activity.NewGroupActivity"
-            android:label="@string/title_activity_new_group" />
+        <activity android:name=".activity.NewGroupActivity" />
+        <activity android:name=".activity.GroupDetailsActivity" />
+        <activity android:name=".activity.AddMembersActivity" />
+
+        <provider
+            android:name="android.support.v4.content.FileProvider"
+            android:authorities="com.yoavs.eventer.fileprovider"
+            android:enabled="true"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths"/>
+        </provider>
     </application>
 
 </manifest>

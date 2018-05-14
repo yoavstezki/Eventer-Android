@@ -2,6 +2,7 @@ package com.yoavs.eventer.DB;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
@@ -30,12 +31,32 @@ public class UserGroupsDB {
 
     }
 
+    static void addGroupToUser(String userId, String groupKey, DatabaseReference.CompletionListener completionListener) {
+
+        Map<String, Object> values = new HashMap<>();
+        values.put(groupKey, true);
+
+        userReference.child(userId).child(groupsNode).updateChildren(values, completionListener);
+    }
+
     static void addGroupToUser(String groupKey, DatabaseReference.CompletionListener completionListener) {
 
         Map<String, Object> values = new HashMap<>();
         values.put(groupKey, true);
 
         userReference.child(currentUser.getUid()).child(groupsNode).updateChildren(values, completionListener);
+    }
+
+    public static void addUserToGroup(final String userId, final String groupKey, final DatabaseReference.CompletionListener completionListener) {
+        Map<String, Object> values = new HashMap<>();
+        values.put(userId, true);
+
+        groupReference.child(groupKey).child("members").updateChildren(values, new DatabaseReference.CompletionListener() {
+            @Override
+            public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
+                addGroupToUser(userId, groupKey, completionListener);
+            }
+        });
     }
 
     public static DatabaseReference findGroup(String groupKey) {

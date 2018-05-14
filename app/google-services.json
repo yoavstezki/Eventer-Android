@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "1059503037320",
+    "firebase_url": "https://eventer-android-8b6fd.firebaseio.com",
+    "project_id": "eventer-android-8b6fd",
+    "storage_bucket": "eventer-android-8b6fd.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1059503037320:android:d7b7ff5e63fb45ff",
+        "android_client_info": {
+          "package_name": "com.yoavs.eventer"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1059503037320-9omhvj0t6lt9vc29fprpaaejhg37tdoe.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.yoavs.eventer",
+            "certificate_hash": "83afcfbe324a337619583dcecceb20a47c773062"
+          }
+        },
+        {
+          "client_id": "1059503037320-vh1kfr5tb4pq1nffp5l3ir9onh8e5h2i.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBCqk6xKwHAUXlsAxZiiY8GxEwKto7GJCk"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1059503037320-vh1kfr5tb4pq1nffp5l3ir9onh8e5h2i.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

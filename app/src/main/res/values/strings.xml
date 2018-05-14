@@ -5,23 +5,18 @@
     <string name="welcome">Welcome</string>
     <string name="new_group">New Group</string>
 
-
-    <string-array name="Planets">
-        <item>Sun</item>
-        <item>Mercury</item>
-        <item>Venus</item>
-        <item>Earth</item>
-        <item>Mars</item>
-        <item>Jupiter</item>
-        <item>Saturn</item>
-        <item>Uranus</item>
-        <item>Neptune</item>
-    </string-array>
-    <string name="title_activity_new_group">NewGroup</string>
+    <string name="title_activity_new_group">Create New Group</string>
     <string name="title_home">Home</string>
     <string name="title_dashboard">Dashboard</string>
     <string name="title_notifications">Notifications</string>
     <string name="title">title</string>
     <string name="create">Create</string>
     <string name="clear">clear</string>
+    <string name="title_activity_group_details">GroupDetailsActivity</string>
+    <string name="failed_to_load_image">Failed To Load Image</string>
+    <string name="no_friends_to_add">You don\'t have any friends to add!</string>
+    <string name="add_group_member">Add Group Member</string>
+    <string name="title_leave_group">Leave Group</string>
+    <string name="create_image_file_error">Error while creating a image file.</string>
+    <string name="error_loading_image">Error with loading image</string>
 </resources>

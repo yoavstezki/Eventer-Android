@@ -1,6 +1,7 @@
 package com.yoavs.eventer.activity;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
@@ -14,20 +15,32 @@ import com.facebook.FacebookException;
 import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FacebookAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.UploadTask;
 import com.yoavs.eventer.DB.UsersDB;
 import com.yoavs.eventer.R;
+import com.yoavs.eventer.events.ImageUploadEvent;
+import com.yoavs.eventer.service.ImageService;
+
+import org.greenrobot.eventbus.EventBus;
 
 public class LoginActivity extends AppCompatActivity {
 
     private static final String TAG = "FACEBOOK_LOG";
     private CallbackManager callbackManager;
     private FirebaseAuth firebaseAuth;
+    private ImageService imageService = new ImageService();
+    private EventBus bus = EventBus.getDefault();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,7 +52,7 @@ public class LoginActivity extends AppCompatActivity {
 
         callbackManager = CallbackManager.Factory.create();
         LoginButton loginButton = findViewById(R.id.fb_login_bn);
-        loginButton.setReadPermissions("email", "public_profile");
+        loginButton.setReadPermissions("email", "public_profile", "user_friends");
         loginButton.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
 
             @Override
@@ -69,8 +82,39 @@ public class LoginActivity extends AppCompatActivity {
         FirebaseUser currentUser = firebaseAuth.getCurrentUser();
 
         if (currentUser != null) {
+            loadImageFromStorage(currentUser.getUid());
             updateUI();
         }
+    }
+
+    private void loadImageFromStorage(String useId) {
+        imageService.loadStorageImage(useId,
+                new OnSuccessListener<Uri>() {
+                    @Override
+                    public void onSuccess(Uri uri) {
+                        bus.post(new ImageUploadEvent(uri));
+                    }
+                }, new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+
+                    }
+                });
+    }
+
+    private void saveFacebookImageToStorage(String userId) {
+        imageService.saveFacebookImageToStorage(userId,
+                new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                    @Override
+                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                        bus.post(new ImageUploadEvent(taskSnapshot.getDownloadUrl()));
+                    }
+                }, new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+
+                    }
+                });
     }
 
     private void updateUI() {
@@ -83,7 +127,6 @@ public class LoginActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        // Pass the activity result back to the Facebook SDK
         callbackManager.onActivityResult(requestCode, resultCode, data);
     }
 
@@ -96,14 +139,30 @@ public class LoginActivity extends AppCompatActivity {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
-                            // Sign in success, update UI with the signed-in user's information
-                            Log.d(TAG, "signInWithCredential:success");
-                            FirebaseUser user = task.getResult().getUser();
-                            UsersDB.getInstance().addUser(user, token.getUserId());
-                            updateUI();
+                            final FirebaseUser user = task.getResult().getUser();
+                            UsersDB.getInstance().findUserByKey(user.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(DataSnapshot dataSnapshot) {
+                                    if (dataSnapshot.exists()) {
+                                        loadImageFromStorage(user.getUid());
+                                        updateUI();
+
+                                    } else {
+                                        String facebookId = token.getUserId();
+                                        UsersDB.getInstance().addUser(user, facebookId);
+                                        saveFacebookImageToStorage(user.getUid());
+                                        updateUI();
+                                    }
+                                }
+
+                                @Override
+                                public void onCancelled(DatabaseError databaseError) {
+
+                                }
+                            });
+
+
                         } else {
-                            // If sign in fails, display a message to the user.
-                            Log.w(TAG, "signInWithCredential:failure", task.getException());
                             Toast.makeText(LoginActivity.this, "Authentication failed.",
                                     Toast.LENGTH_SHORT).show();
                         }

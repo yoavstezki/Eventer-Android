@@ -25,7 +25,7 @@ public class GroupViewHolder extends RecyclerView.ViewHolder {
     }
 
     public void bindToGroup(Group group) {
-        groupNameView.setText(group.title);
+        groupNameView.setText(group.getTitle());
     }
 
 
