@@ -13,6 +13,7 @@ import android.widget.ProgressBar;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.ValueEventListener;
+import com.yoavs.eventer.DB.GroupsDB;
 import com.yoavs.eventer.DB.UserGroupsDB;
 import com.yoavs.eventer.R;
 import com.yoavs.eventer.activity.GroupDetailsActivity;
@@ -31,6 +32,10 @@ public class GroupsFragment extends ListFragment {
 
     private static final String TAG = "GroupsFragment";
     private List<Group> groups;
+    private ProgressBar progressBar;
+    private GroupListAdapter groupListAdapter;
+    private ValueEventListener groupEventListener;
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -39,24 +44,29 @@ public class GroupsFragment extends ListFragment {
         View rootView = inflater.inflate(R.layout.fragment_groups, container, false);
 
         FloatingActionButton addNewGroup = rootView.findViewById(R.id.add_new_group);
-        final ProgressBar progressBar = rootView.findViewById(R.id.groups_progress_bar);
+        progressBar = rootView.findViewById(R.id.groups_progress_bar);
 
         setOnClick(addNewGroup);
 
-
         groups = new ArrayList<>();
-        final GroupListAdapter groupListAdapter = new GroupListAdapter(getActivity(), groups);
+        groupListAdapter = new GroupListAdapter(getActivity(), groups);
         setListAdapter(groupListAdapter);
 
+        initModel();
 
-        UserGroupsDB.getUserGroups().addValueEventListener(new ValueEventListener() {
+
+        return rootView;
+    }
+
+    private void initModel() {
+        groupEventListener = new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 groups.clear();
 
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                     String groupKey = snapshot.getKey();
-                    UserGroupsDB.findGroup(groupKey).addListenerForSingleValueEvent(new ValueEventListener() {
+                    GroupsDB.findGroup(groupKey).addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
                         public void onDataChange(DataSnapshot dataSnapshot) {
                             Group group = dataSnapshot.getValue(Group.class);
@@ -83,10 +93,8 @@ public class GroupsFragment extends ListFragment {
             public void onCancelled(DatabaseError databaseError) {
                 progressBar.setVisibility(View.GONE);
             }
-        });
-
-
-        return rootView;
+        };
+        UserGroupsDB.getUserGroups().addValueEventListener(groupEventListener);
     }
 
     private void setOnClick(FloatingActionButton addNewGroup) {
@@ -111,5 +119,12 @@ public class GroupsFragment extends ListFragment {
         intent.putExtra("groupKey", group.getKey());
 
         startActivity(intent);
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+
+        UserGroupsDB.getUserGroups().removeEventListener(groupEventListener);
     }
 }

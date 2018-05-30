@@ -75,6 +75,7 @@ public class AddMembersActivity extends BaseActivity {
             public void onCompleted(JSONArray array, GraphResponse response) {
                 JSONObject object = response.getJSONObject();
                 try {
+                    //todo: stop working need to fix!
                     JSONArray data = object.getJSONArray("data");
 
                     for (int i = 0; i < data.length(); i++) {

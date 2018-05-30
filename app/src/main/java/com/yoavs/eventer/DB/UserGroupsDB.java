@@ -58,8 +58,4 @@ public class UserGroupsDB {
             }
         });
     }
-
-    public static DatabaseReference findGroup(String groupKey) {
-        return groupReference.child(groupKey);
-    }
 }

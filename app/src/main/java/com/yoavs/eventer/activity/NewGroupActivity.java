@@ -32,7 +32,7 @@ public class NewGroupActivity extends BaseActivity {
 
         firebaseAuth = FirebaseAuth.getInstance();
 
-        titleEditText = findViewById(R.id.new_group_title);
+        titleEditText = findViewById(R.id.new_group_name);
         clearBtn = findViewById(R.id.new_group_clear_btn);
         createBtn = findViewById(R.id.new_group_create_btn);
         progressBar = findViewById(R.id.new_group_pb);
@@ -59,7 +59,7 @@ public class NewGroupActivity extends BaseActivity {
 
                 String title = titleEditText.getText().toString();
 
-                GroupsDB.instance.addGroup(title, firebaseAuth.getCurrentUser().getUid(), new DatabaseReference.CompletionListener() {
+                GroupsDB.addGroup(title, firebaseAuth.getCurrentUser().getUid(), new DatabaseReference.CompletionListener() {
                     @Override
                     public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
                         progressBar.setVisibility(View.GONE);

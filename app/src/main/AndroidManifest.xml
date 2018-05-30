@@ -51,6 +51,9 @@
         <activity android:name=".activity.NewGroupActivity" />
         <activity android:name=".activity.GroupDetailsActivity" />
         <activity android:name=".activity.AddMembersActivity" />
+        <activity android:name=".activity.NewEventActivity" />
+        <activity android:name=".activity.EventDetailsActivity" />
+        <activity android:name=".activity.CreateOrUpdateRequestActivity" />
 
         <provider
             android:name="android.support.v4.content.FileProvider"
@@ -59,7 +62,7 @@
             android:grantUriPermissions="true">
             <meta-data
                 android:name="android.support.FILE_PROVIDER_PATHS"
-                android:resource="@xml/file_paths"/>
+                android:resource="@xml/file_paths" />
         </provider>
     </application>
 

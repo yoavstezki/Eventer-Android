@@ -3,8 +3,8 @@ package com.yoavs.eventer.DB;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.yoavs.eventer.entity.Group;
-import com.yoavs.eventer.factory.GroupDBFactory;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -16,18 +16,15 @@ import java.util.Map;
 
 public class GroupsDB {
 
-    public static volatile GroupsDB instance = new GroupsDB();
-    private final String root = "groups";
-    private final GroupDBFactory groupDBFactory;
-    private DatabaseReference databaseReference;
+    private static final String root = "groups";
+    private static DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference(root);
     private Map<String, Group> userCache = new HashMap<>();
 
-    private GroupsDB() {
-        databaseReference = FirebaseDatabase.getInstance().getReference(root);
-        groupDBFactory = new GroupDBFactory();
+    public static DatabaseReference findGroup(String groupKey) {
+        return databaseReference.child(groupKey);
     }
 
-    public void addGroup(String title, final String userKey, final DatabaseReference.CompletionListener completionListener) {
+    public static void addGroup(String title, final String userKey, final DatabaseReference.CompletionListener completionListener) {
 
         final String groupKey = databaseReference.push().getKey();
 
@@ -45,5 +42,9 @@ public class GroupsDB {
                 UserGroupsDB.addGroupToUser(groupKey, completionListener);
             }
         });
+    }
+
+    public static Query getGroupTitleQuery(String groupKey) {
+        return databaseReference.child(groupKey).orderByChild("title");
     }
 }

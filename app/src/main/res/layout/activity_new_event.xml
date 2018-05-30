@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.yoavs.eventer.activity.NewGroupActivity">
+    tools:context="com.yoavs.eventer.activity.NewEventActivity">
 
     <android.support.design.widget.AppBarLayout
         android:id="@+id/app_bar_layout"
@@ -13,7 +13,7 @@
         android:theme="@style/AppTheme.AppBarOverlay">
 
         <android.support.v7.widget.Toolbar
-            android:id="@+id/new_group_toolbar"
+            android:id="@+id/new_event_toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:background="?attr/colorPrimary"
@@ -22,12 +22,12 @@
 
 
             <TextView
-                android:id="@+id/title_new_group"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:text="@string/title_activity_new_group"
+                android:text="@string/title_activity_new_event"
                 android:textSize="20sp" />
+
 
         </android.support.v7.widget.Toolbar>
 
@@ -40,34 +40,62 @@
 
 
         <android.support.design.widget.TextInputLayout
-            android:id="@+id/group_name_input_layout"
+            android:id="@+id/event_name_input_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:padding="10dp">
 
             <android.support.design.widget.TextInputEditText
-                android:id="@+id/new_group_name"
+                android:id="@+id/new_event_title"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="@string/select_title" />
         </android.support.design.widget.TextInputLayout>
 
+        <android.support.design.widget.TextInputLayout
+            android:id="@+id/event_date_input_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/event_name_input_layout"
+            android:padding="10dp">
+
+            <android.support.design.widget.TextInputEditText
+                android:id="@+id/new_event_date"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:focusable="false"
+                android:hint="@string/choose_date" />
+        </android.support.design.widget.TextInputLayout>
+
+
+        <Spinner
+            android:id="@+id/group_list_spinner"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/event_date_input_layout"
+            android:dropDownVerticalOffset="35sp"
+            android:hint="@string/select_group"
+            android:padding="10dp"
+            android:spinnerMode="dropdown"
+            android:textSize="20sp"
+            />
+
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_below="@+id/group_name_input_layout"
+            android:layout_below="@+id/group_list_spinner"
             android:padding="10dp">
 
             <Button
-                android:id="@+id/new_group_clear_btn"
+                android:id="@+id/new_event_clear_btn"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="0.5"
                 android:text="@string/clear" />
 
             <Button
-                android:id="@+id/new_group_create_btn"
+                android:id="@+id/new_event_create_btn"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="0.5"
@@ -77,7 +105,7 @@
 
 
         <ProgressBar
-            android:id="@+id/new_group_pb"
+            android:id="@+id/new_event_pb"
             style="?android:attr/progressBarStyle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

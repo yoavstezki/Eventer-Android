@@ -18,7 +18,7 @@ import java.util.List;
  * @author yoavs
  */
 
-public class GroupListAdapter extends ArrayAdapter<Group> {
+    public class GroupListAdapter extends ArrayAdapter<Group> {
 
     public GroupListAdapter(@NonNull Context context, List<Group> groups) {
         super(context, 0, groups);

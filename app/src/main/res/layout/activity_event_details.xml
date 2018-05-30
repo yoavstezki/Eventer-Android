@@ -11,38 +11,64 @@
         android:layout_height="wrap_content"
         android:theme="@style/AppTheme.AppBarOverlay">
 
+
         <android.support.v7.widget.Toolbar
-            android:id="@+id/group_toolbar"
+            android:id="@+id/event_toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:background="?attr/colorPrimary"
             app:navigationIcon="?attr/homeAsUpIndicator"
             app:popupTheme="@style/AppTheme.PopupOverlay">
 
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
 
-            <TextView
-                android:id="@+id/title_group_name"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:textSize="20sp" />
+                <TextView
+                    android:id="@+id/event_name"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_marginStart="25dp"
+                    android:textSize="20sp" />
+
+                <TextView
+                    android:id="@+id/arrow"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_marginStart="5dp"
+                    android:layout_toEndOf="@id/event_name"
+                    android:text="@string/hyphen"
+                    android:textSize="20sp" />
+
+                <TextView
+                    android:id="@+id/event_date"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_marginStart="5dp"
+                    android:layout_toEndOf="@id/arrow"
+                    android:textSize="20sp" />
+            </RelativeLayout>
 
         </android.support.v7.widget.Toolbar>
+
 
     </android.support.design.widget.AppBarLayout>
 
     <ProgressBar
-        android:id="@+id/group_details_progress_bar"
+        android:id="@+id/event_details_progress_bar"
         style="?android:attr/progressBarStyle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:visibility="visible" />
 
-    <include layout="@layout/content_group_details" />
+    <include layout="@layout/content_event_details" />
 
     <android.support.design.widget.FloatingActionButton
-        android:id="@+id/add_member_fab"
+        android:id="@+id/add_request_fab"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"

@@ -169,9 +169,9 @@ public class ProfileFragment extends Fragment {
     }
 
     @Override
-    public void onDestroy() {
+    public void onDestroyView() {
         bus.unregister(this);
-        super.onDestroy();
+        super.onDestroyView();
     }
 
     private void dispatchTakePictureIntent() {

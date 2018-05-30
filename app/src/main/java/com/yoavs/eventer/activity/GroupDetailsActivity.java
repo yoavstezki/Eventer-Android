@@ -36,7 +36,7 @@ public class GroupDetailsActivity extends BaseActivity {
     private MemberListAdapter memberListAdapter;
 
     public GroupDetailsActivity() {
-        super(R.layout.activity_group_details, R.id.toolbar);
+        super(R.layout.activity_group_details, R.id.group_toolbar);
     }
 
     @Override
@@ -49,7 +49,7 @@ public class GroupDetailsActivity extends BaseActivity {
         setOnAddMemberClick();
 
         members = new ArrayList<>();
-        TextView groupNameText = findViewById(R.id.group_name);
+        TextView groupNameText = findViewById(R.id.title_group_name);
         ListView memberList = findViewById(R.id.member_list);
 
         ProgressBar progressBar = findViewById(R.id.group_details_progress_bar);
@@ -140,6 +140,7 @@ public class GroupDetailsActivity extends BaseActivity {
         switch (item.getItemId()) {
             case R.id.action_delete: {
                 eventBus.post(new UserLeaveGroupEvent(groupKey, firebaseAuth.getUid()));
+                GroupDetailsActivity.this.onBackPressed();
             }
         }
 
