@@ -82,39 +82,12 @@ public class LoginActivity extends AppCompatActivity {
         FirebaseUser currentUser = firebaseAuth.getCurrentUser();
 
         if (currentUser != null) {
-            loadImageFromStorage(currentUser.getUid());
             updateUI();
         }
     }
 
-    private void loadImageFromStorage(String useId) {
-        imageService.loadStorageImage(useId,
-                new OnSuccessListener<Uri>() {
-                    @Override
-                    public void onSuccess(Uri uri) {
-                        bus.post(new ImageUploadEvent(uri));
-                    }
-                }, new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-
-                    }
-                });
-    }
-
     private void saveFacebookImageToStorage(String userId) {
-        imageService.saveFacebookImageToStorage(userId,
-                new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                    @Override
-                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                        bus.post(new ImageUploadEvent(taskSnapshot.getDownloadUrl()));
-                    }
-                }, new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-
-                    }
-                });
+        imageService.saveFacebookImageToStorage(userId);
     }
 
     private void updateUI() {
@@ -144,7 +117,6 @@ public class LoginActivity extends AppCompatActivity {
                                 @Override
                                 public void onDataChange(DataSnapshot dataSnapshot) {
                                     if (dataSnapshot.exists()) {
-                                        loadImageFromStorage(user.getUid());
                                         updateUI();
 
                                     } else {

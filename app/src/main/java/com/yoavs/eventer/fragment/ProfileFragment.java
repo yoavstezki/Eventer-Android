@@ -21,6 +21,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.facebook.login.LoginManager;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.squareup.picasso.Callback;
@@ -28,13 +30,8 @@ import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 import com.yoavs.eventer.R;
 import com.yoavs.eventer.activity.LoginActivity;
-import com.yoavs.eventer.events.ImageUploadEvent;
 import com.yoavs.eventer.service.ImageService;
 import com.yoavs.eventer.utils.FileUtil;
-
-import org.greenrobot.eventbus.EventBus;
-import org.greenrobot.eventbus.Subscribe;
-import org.greenrobot.eventbus.ThreadMode;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -50,7 +47,6 @@ public class ProfileFragment extends Fragment {
     private Button logout;
     private TextView userName;
     private ProgressBar progressBar;
-    private EventBus bus = EventBus.getDefault();
     private ImageService imageService = new ImageService();
 
     @Nullable
@@ -71,8 +67,6 @@ public class ProfileFragment extends Fragment {
                 dispatchTakePictureIntent();
             }
         });
-
-        bus.register(this);
 
         return rootView;
     }
@@ -101,17 +95,31 @@ public class ProfileFragment extends Fragment {
             }
         });
 
+        loadImage();
+
     }
 
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    public void loadImage(ImageUploadEvent imageUploadEvent) {
+    public void loadImage() {
+        String uid = firebaseAuth.getUid();
         try {
-            File file = FileUtil.searchFileBy(firebaseAuth.getUid(), getContext());
+            File file = FileUtil.searchFileBy(uid, getContext());
             loadImageFrom(file);
 
             progressBar.setVisibility(View.GONE);
         } catch (FileNotFoundException e) {
-            downloadFile(imageUploadEvent);
+            imageService.loadStorageImage(uid,
+                    new OnSuccessListener<Uri>() {
+                        @Override
+                        public void onSuccess(Uri uri) {
+                            downloadFile(uri);
+                        }
+                    },
+                    new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            Toast.makeText(ProfileFragment.this.getContext(), getString(R.string.failed_to_load_image), Toast.LENGTH_LONG).show();
+                        }
+                    });
         }
     }
 
@@ -122,10 +130,10 @@ public class ProfileFragment extends Fragment {
                 .into(profilePicture, imageLoaded());
     }
 
-    private void downloadFile(ImageUploadEvent imageUploadEvent) {
-
+    private void downloadFile(Uri imageURI) {
         Picasso.get()
-                .load(imageUploadEvent.getDownloadUri())
+                .load(imageURI)
+                .resize(500, 500)
                 .into(new Target() {
                     @Override
                     public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
@@ -170,7 +178,6 @@ public class ProfileFragment extends Fragment {
 
     @Override
     public void onDestroyView() {
-        bus.unregister(this);
         super.onDestroyView();
     }
 
@@ -199,7 +206,7 @@ public class ProfileFragment extends Fragment {
                 File file = FileUtil.searchFileBy(uid, getContext());
                 Uri photoUri = getUriForFile(file);
                 loadImageFrom(photoUri);
-                imageService.saveImageToStorage(uid, photoUri);
+                imageService.saveImage(uid, photoUri, getContext());
 
             } catch (FileNotFoundException e) {
                 progressBar.setVisibility(View.GONE);
