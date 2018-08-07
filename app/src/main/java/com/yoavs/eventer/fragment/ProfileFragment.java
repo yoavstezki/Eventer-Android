@@ -2,7 +2,6 @@ package com.yoavs.eventer.fragment;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -10,7 +9,6 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
-import android.support.v4.content.FileProvider;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,7 +25,6 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
-import com.squareup.picasso.Target;
 import com.yoavs.eventer.R;
 import com.yoavs.eventer.activity.LoginActivity;
 import com.yoavs.eventer.service.ImageService;
@@ -35,6 +32,7 @@ import com.yoavs.eventer.utils.FileUtil;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 
 import static android.app.Activity.RESULT_OK;
 
@@ -96,7 +94,6 @@ public class ProfileFragment extends Fragment {
         });
 
         loadImage();
-
     }
 
     public void loadImage() {
@@ -111,7 +108,7 @@ public class ProfileFragment extends Fragment {
                     new OnSuccessListener<Uri>() {
                         @Override
                         public void onSuccess(Uri uri) {
-                            downloadFile(uri);
+                            downloadImageFile(uri);
                         }
                     },
                     new OnFailureListener() {
@@ -130,27 +127,20 @@ public class ProfileFragment extends Fragment {
                 .into(profilePicture, imageLoaded());
     }
 
-    private void downloadFile(Uri imageURI) {
-        Picasso.get()
-                .load(imageURI)
-                .resize(500, 500)
-                .into(new Target() {
+    private void downloadImageFile(Uri imageURI) {
+        FileUtil.downloadImageFile(imageURI,
+                new OnSuccessListener<Bitmap>() {
                     @Override
-                    public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
+                    public void onSuccess(Bitmap bitmap) {
                         profilePicture.setImageBitmap(bitmap);
                         progressBar.setVisibility(View.GONE);
                         FileUtil.saveImageFile(firebaseAuth.getUid(), bitmap, getContext());
                     }
-
+                }, new OnFailureListener() {
                     @Override
-                    public void onBitmapFailed(Exception e, Drawable errorDrawable) {
+                    public void onFailure(@NonNull Exception e) {
                         progressBar.setVisibility(View.GONE);
                         Toast.makeText(ProfileFragment.this.getContext(), getString(R.string.failed_to_load_image), Toast.LENGTH_LONG).show();
-                    }
-
-                    @Override
-                    public void onPrepareLoad(Drawable placeHolderDrawable) {
-
                     }
                 });
     }
@@ -187,15 +177,12 @@ public class ProfileFragment extends Fragment {
 
             File photoFile = FileUtil.createImageFile(firebaseAuth.getUid(), getContext());
 
-            Uri photoURI = getUriForFile(photoFile);
+            Uri photoURI = FileUtil.getUriForFile(photoFile, getContext());
             takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
             startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
         }
     }
 
-    private Uri getUriForFile(File photoFile) {
-        return FileProvider.getUriForFile(getContext(), "com.yoavs.eventer.fileprovider", photoFile);
-    }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -204,12 +191,17 @@ public class ProfileFragment extends Fragment {
             try {
                 String uid = firebaseAuth.getUid();
                 File file = FileUtil.searchFileBy(uid, getContext());
-                Uri photoUri = getUriForFile(file);
+                Uri photoUri = FileUtil.getUriForFile(file, getContext());
+                Bitmap bitmap = MediaStore.Images.Media.getBitmap(this.getActivity().getContentResolver(), photoUri);
+
                 loadImageFrom(photoUri);
-                imageService.saveImage(uid, photoUri, getContext());
+
+                imageService.uploadImageToStorage(uid, bitmap);
 
             } catch (FileNotFoundException e) {
                 progressBar.setVisibility(View.GONE);
+            } catch (IOException e) {
+                e.printStackTrace();
             }
         }
     }
@@ -218,7 +210,6 @@ public class ProfileFragment extends Fragment {
         Picasso.get()
                 .load(uri)
                 .resize(500, 500)
-                .rotate(90)
                 .into(profilePicture, imageLoaded());
     }
 }

@@ -1,7 +1,6 @@
 package com.yoavs.eventer.activity;
 
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
@@ -64,18 +63,24 @@ public class AddMembersActivity extends BaseActivity {
 
         setOnItemClick();
 
-        FacebookFriendsFinderService.find(facebookFriendsFinderCallback());
+        GraphRequest.GraphJSONArrayCallback facebookFriendsFinderCallback = facebookFriendsFinderCallback();
+
+        FacebookFriendsFinderService.find(facebookFriendsFinderCallback);
     }
 
-    @NonNull
     private GraphRequest.GraphJSONArrayCallback facebookFriendsFinderCallback() {
         return new GraphRequest.GraphJSONArrayCallback() {
 
             @Override
             public void onCompleted(JSONArray array, GraphResponse response) {
+
                 JSONObject object = response.getJSONObject();
+
+                if (object == null) {
+                    return;
+                }
+
                 try {
-                    //todo: stop working need to fix!
                     JSONArray data = object.getJSONArray("data");
 
                     for (int i = 0; i < data.length(); i++) {
