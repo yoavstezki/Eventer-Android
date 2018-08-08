@@ -93,60 +93,31 @@ public class ProfileFragment extends Fragment {
             }
         });
 
-        loadImage();
-    }
-
-    public void loadImage() {
-        String uid = firebaseAuth.getUid();
-        try {
-            File file = FileUtil.searchFileBy(uid, getContext());
-            loadImageFrom(file);
-
-            progressBar.setVisibility(View.GONE);
-        } catch (FileNotFoundException e) {
-            imageService.loadStorageImage(uid,
-                    new OnSuccessListener<Uri>() {
-                        @Override
-                        public void onSuccess(Uri uri) {
-                            downloadImageFile(uri);
-                        }
-                    },
-                    new OnFailureListener() {
-                        @Override
-                        public void onFailure(@NonNull Exception e) {
-                            Toast.makeText(ProfileFragment.this.getContext(), getString(R.string.failed_to_load_image), Toast.LENGTH_LONG).show();
-                        }
-                    });
-        }
-    }
-
-    private void loadImageFrom(File file) {
-        Picasso.get()
-                .load(file)
-                .resize(500, 500)
-                .into(profilePicture, imageLoaded());
-    }
-
-    private void downloadImageFile(Uri imageURI) {
-        FileUtil.downloadImageFile(imageURI,
-                new OnSuccessListener<Bitmap>() {
-                    @Override
-                    public void onSuccess(Bitmap bitmap) {
-                        profilePicture.setImageBitmap(bitmap);
-                        progressBar.setVisibility(View.GONE);
-                        FileUtil.saveImageFile(firebaseAuth.getUid(), bitmap, getContext());
-                    }
-                }, new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        progressBar.setVisibility(View.GONE);
-                        Toast.makeText(ProfileFragment.this.getContext(), getString(R.string.failed_to_load_image), Toast.LENGTH_LONG).show();
-                    }
-                });
+        imageService.loadImage(firebaseAuth.getUid(), getContext(), getOnSuccess(), getOnFailure());
     }
 
     @NonNull
-    private Callback imageLoaded() {
+    private OnFailureListener getOnFailure() {
+        return new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Toast.makeText(ProfileFragment.this.getContext(), getString(R.string.failed_to_load_image), Toast.LENGTH_LONG).show();
+            }
+        };
+    }
+
+    @NonNull
+    private OnSuccessListener<Uri> getOnSuccess() {
+        return new OnSuccessListener<Uri>() {
+            @Override
+            public void onSuccess(Uri uri) {
+                loadImageFrom(uri);
+            }
+        };
+    }
+
+    @NonNull
+    private Callback onImageLoaded() {
         return new Callback() {
             @Override
             public void onSuccess() {
@@ -183,7 +154,6 @@ public class ProfileFragment extends Fragment {
         }
     }
 
-
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
@@ -196,7 +166,7 @@ public class ProfileFragment extends Fragment {
 
                 loadImageFrom(photoUri);
 
-                imageService.uploadImageToStorage(uid, bitmap);
+                imageService.saveImageToStorage(uid, bitmap);
 
             } catch (FileNotFoundException e) {
                 progressBar.setVisibility(View.GONE);
@@ -210,7 +180,7 @@ public class ProfileFragment extends Fragment {
         Picasso.get()
                 .load(uri)
                 .resize(500, 500)
-                .into(profilePicture, imageLoaded());
+                .into(profilePicture, onImageLoaded());
     }
 }
 
