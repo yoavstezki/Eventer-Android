@@ -11,10 +11,8 @@ import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.ValueEventListener;
 import com.yoavs.eventer.DB.GroupMemberDB;
 import com.yoavs.eventer.DB.UsersDB;
 import com.yoavs.eventer.R;
@@ -25,6 +23,7 @@ import com.yoavs.eventer.events.UserLeaveGroupEvent;
 import org.greenrobot.eventbus.EventBus;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class GroupDetailsActivity extends BaseActivity {
 
@@ -71,48 +70,30 @@ public class GroupDetailsActivity extends BaseActivity {
     }
 
     private void getMembersGroup() {
-        GroupMemberDB.getInstance().getMembersBy(groupKey)
-                .addValueEventListener(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-                        members.clear();
-                        for (DataSnapshot userKeySnapshot : dataSnapshot.getChildren()) {
-                            String userKey = userKeySnapshot.getKey();
-                            findMemberBy(userKey, memberListAdapter);
-                        }
+        GroupMemberDB.getInstance().getMembersBy(groupKey, getApplicationContext(), new OnSuccessListener<List<String>>() {
+            @Override
+            public void onSuccess(List<String> userKeys) {
+                members.clear();
+                findMemberBy(userKeys);
+            }
+        });
 
-                    }
 
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
-
-                    }
-                });
     }
 
-    private void findMemberBy(String userKey, final MemberListAdapter memberListAdapter) {
-        UsersDB.getInstance().findUserByKey(userKey)
-                .addValueEventListener(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
+    private void findMemberBy(List<String> userKeys) {
 
-                        User user = dataSnapshot.getValue(User.class);
-                        if (user == null) {
-                            return;
-                        }
-                        user.setUId(dataSnapshot.getKey());
-
-                        if (!members.contains(user)) {
-                            members.add(user);
-                            memberListAdapter.notifyDataSetChanged();
-                        }
+        for (String userKey : userKeys) {
+            UsersDB.getInstance().findUserByKey(userKey, new OnSuccessListener<User>() {
+                @Override
+                public void onSuccess(User user) {
+                    if (!members.contains(user)) {
+                        members.add(user);
+                        memberListAdapter.notifyDataSetChanged();
                     }
-
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
-
-                    }
-                });
+                }
+            });
+        }
     }
 
     private void setOnAddMemberClick() {

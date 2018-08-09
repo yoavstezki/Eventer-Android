@@ -1,7 +1,6 @@
 package com.yoavs.eventer.activity;
 
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
@@ -15,8 +14,6 @@ import com.facebook.FacebookException;
 import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
 import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
@@ -26,10 +23,8 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.ValueEventListener;
-import com.google.firebase.storage.UploadTask;
 import com.yoavs.eventer.DB.UsersDB;
 import com.yoavs.eventer.R;
-import com.yoavs.eventer.events.ImageUploadEvent;
 import com.yoavs.eventer.service.ImageService;
 
 import org.greenrobot.eventbus.EventBus;
@@ -86,10 +81,6 @@ public class LoginActivity extends AppCompatActivity {
         }
     }
 
-    private void saveFacebookImageToStorage(String userId) {
-        imageService.saveFacebookImageToStorage(userId);
-    }
-
     private void updateUI() {
         Intent intent = new Intent(LoginActivity.this, MainActivity.class);
         startActivity(intent);
@@ -113,7 +104,7 @@ public class LoginActivity extends AppCompatActivity {
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
                             final FirebaseUser user = task.getResult().getUser();
-                            UsersDB.getInstance().findUserByKey(user.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
+                            UsersDB.getInstance().getUserReference(user.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
                                 @Override
                                 public void onDataChange(DataSnapshot dataSnapshot) {
                                     if (dataSnapshot.exists()) {
@@ -122,7 +113,7 @@ public class LoginActivity extends AppCompatActivity {
                                     } else {
                                         String facebookId = token.getUserId();
                                         UsersDB.getInstance().addUser(user, facebookId);
-                                        saveFacebookImageToStorage(user.getUid());
+                                        imageService.saveFacebookImageToStorage(user.getUid());
                                         updateUI();
                                     }
                                 }

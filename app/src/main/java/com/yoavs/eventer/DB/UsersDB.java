@@ -1,9 +1,13 @@
 package com.yoavs.eventer.DB;
 
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 import com.yoavs.eventer.entity.User;
 import com.yoavs.eventer.events.UserLeaveGroupEvent;
 
@@ -30,8 +34,29 @@ public class UsersDB {
         return usersDB;
     }
 
-    public DatabaseReference findUserByKey(String key) {
+    public DatabaseReference getUserReference(String key) {
         return usersReference.child(key);
+    }
+
+    public void findUserByKey(String key, final OnSuccessListener<User> onSuccessListener) {
+        usersReference.child(key)
+                .addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        User user = dataSnapshot.getValue(User.class);
+                        if (user == null) {
+                            return;
+                        }
+                        user.setUId(dataSnapshot.getKey());
+
+                        onSuccessListener.onSuccess(user);
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                });
     }
 
     public Query findUserByFacebookId(String facebookId) {

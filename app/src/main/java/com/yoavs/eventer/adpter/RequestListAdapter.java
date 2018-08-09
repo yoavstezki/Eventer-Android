@@ -68,7 +68,7 @@ public class RequestListAdapter extends ArrayAdapter<Request> {
                 requestItemName.setPaintFlags(requestItemName.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
 
 
-                UsersDB.getInstance().findUserByKey(request.getApprovalUserId()).addListenerForSingleValueEvent(new ValueEventListener() {
+                UsersDB.getInstance().getUserReference(request.getApprovalUserId()).addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
                         if (dataSnapshot.exists()) {

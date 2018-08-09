@@ -90,7 +90,7 @@ public class ImageService {
             onSuccess.onSuccess(Uri.fromFile(file));
         } catch (FileNotFoundException e) {
             loadFromStorage(uid, context, onSuccess, onFailure);
-            Log.e(TAG, "Imgae file not found locally, trying to get from remote", e);
+//            Log.e(TAG, "Imgae file not found locally, trying to get from remote", e);
         }
     }
 
@@ -102,7 +102,7 @@ public class ImageService {
                     Bitmap bitmap = MediaStore.Images.Media.getBitmap(context.getContentResolver(), imageUri);
                     FileUtil.saveImageFile(uid, bitmap, context);
                 } catch (IOException e) {
-                    Log.e(TAG, "throw some error when trying to get image from uri ", e);
+//                    Log.e(TAG, "throw some error when trying to get image from uri ", e);
                 }
             }
         }).call();

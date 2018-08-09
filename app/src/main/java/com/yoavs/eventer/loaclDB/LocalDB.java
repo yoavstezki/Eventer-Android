@@ -10,8 +10,8 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 public class LocalDB extends SQLiteOpenHelper {
 
-    public static final int DATABASE_VERSION = 1;
-    public static final String DATABASE_NAME = "Eventer.db";
+    static final int DATABASE_VERSION = 1;
+    static final String DATABASE_NAME = "Eventer.db";
 
     public LocalDB(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -20,6 +20,7 @@ public class LocalDB extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase db) {
         db.execSQL(LastUpdateTable.SQL_CREATE_LAST_UPDATE);
+        db.execSQL(GroupMembersTable.SQL_CREATE_GROUP_MEMBERS);
     }
 
     @Override

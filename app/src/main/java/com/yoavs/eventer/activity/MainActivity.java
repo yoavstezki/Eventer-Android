@@ -12,6 +12,7 @@ import com.yoavs.eventer.R;
 import com.yoavs.eventer.fragment.EventFragment;
 import com.yoavs.eventer.fragment.GroupsFragment;
 import com.yoavs.eventer.fragment.ProfileFragment;
+import com.yoavs.eventer.loaclDB.LocalDB;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,6 +32,8 @@ public class MainActivity extends AppCompatActivity {
 
         tabLayout = findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(viewPager);
+
+        createLocalDB();
     }
 
     private void setupViewPager(ViewPager viewPager) {
@@ -39,6 +42,10 @@ public class MainActivity extends AppCompatActivity {
         adapter.addFragment(new EventFragment(), "Events");
         adapter.addFragment(new ProfileFragment(), "Profile");
         viewPager.setAdapter(adapter);
+    }
+
+    private void createLocalDB() {
+        new LocalDB(getApplicationContext());
     }
 
     class ViewPagerAdapter extends FragmentPagerAdapter {
