@@ -4,7 +4,6 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
-import android.provider.MediaStore;
 import android.util.Log;
 
 import com.facebook.Profile;
@@ -20,7 +19,6 @@ import com.yoavs.eventer.utils.FileUtil;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.util.concurrent.Executors;
 
 /**
@@ -98,12 +96,30 @@ public class ImageService {
         Executors.callable(new Runnable() {
             @Override
             public void run() {
-                try {
-                    Bitmap bitmap = MediaStore.Images.Media.getBitmap(context.getContentResolver(), imageUri);
-                    FileUtil.saveImageFile(uid, bitmap, context);
-                } catch (IOException e) {
+//                try {
+
+                Picasso.get().load(imageUri).into(new Target() {
+                    @Override
+                    public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
+                        FileUtil.saveImageFile(uid, bitmap, context);
+                    }
+
+                    @Override
+                    public void onBitmapFailed(Exception e, Drawable errorDrawable) {
+                        Log.e(TAG, "throw some error when trying to get image from uri ", e);
+                    }
+
+                    @Override
+                    public void onPrepareLoad(Drawable placeHolderDrawable) {
+
+                    }
+                });
+
+//                    Bitmap bitmap = MediaStore.Images.Media.getBitmap(context.getContentResolver(), imageUri);
+//                    FileUtil.saveImageFile(uid, bitmap, context);
+//                } catch (IOException e) {
 //                    Log.e(TAG, "throw some error when trying to get image from uri ", e);
-                }
+//                }
             }
         }).call();
     }
