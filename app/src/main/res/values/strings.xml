@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">Eventer</string>
-    <string name="facebook_app_id">214793839083213</string>
-    <string name="fb_login_protocol_scheme">fb214793839083213</string>
+    <string name="facebook_app_id"></string>
+    <string name="fb_login_protocol_scheme"></string>
     <string name="welcome">Welcome</string>
     <string name="new_group">New Group</string>
 
